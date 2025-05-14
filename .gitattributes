@@ -64,5 +64,8 @@ performance-tests/rt-tests/graphs/rt_migrate_plot_prio_80.png filter=lfs diff=lf
 performance-tests/rt-tests/graphs/rt_migrate_plot_prio_85.png filter=lfs diff=lfs merge=lfs -text
 performance-tests/rt-tests/graphs/rt_migrate_plot_prio_90.png filter=lfs diff=lfs merge=lfs -text
 performance-tests/rt-tests/graphs/rt_migrate_plot_prio_95.png filter=lfs diff=lfs merge=lfs -text
+neuron-circuits/rtxi filter=lfs diff=lfs merge=lfs -text
+performance-tests/rt-benchmarks filter=lfs diff=lfs merge=lfs -text
+performance-tests/rt-tests filter=lfs diff=lfs merge=lfs -text
 *.h5 filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
