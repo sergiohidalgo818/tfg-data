@@ -69,3 +69,4 @@ performance-tests/rt-benchmarks filter=lfs diff=lfs merge=lfs -text
 performance-tests/rt-tests filter=lfs diff=lfs merge=lfs -text
 *.h5 filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
+*.parquet filter=lfs diff=lfs merge=lfs -text
