@@ -1,3 +1,6 @@
+# Merged data
+performance-tests/rt-benchmarks/merged-data/data.parquet
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

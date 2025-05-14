@@ -2,7 +2,7 @@
 
 ## Prerrequisites
 
-If you want to merge or plot the data by yourself, you will need to use `uv run scripts/<script>`. For installing `uv`, please go to [the official uv page](https://docs.astral.sh/uv/getting-started/installation/).
+For executing any of the scripts, you will need to use `uv run scripts/<script>`. For installing `uv`, please go to [the official uv page](https://docs.astral.sh/uv/getting-started/installation/).
 
 ## Execution
 
@@ -15,9 +15,13 @@ stress -c 4 --vm 20 --vm-bytes 128M --timeout 300
 
 ## Data treatment
 
-In order to simplifying the analysis of this data, it has been merged into a single parquet file, generated from the HDF5 files. This is done with the script `merge-data.py` under `scripts/` folder. Also, there are some data inside a writing that could be a few registers longer so it is checked the minimum length and that's the maximum number of registers that will bee kept for each priority. Also, all the data is in $ns$ so it has been transformed into $\mu s$. Also, data has been tagged if it was retrieved during a execution with stress.
+In order to simplifying the analysis of this data, it has been merged into a single parquet file, generated from the HDF5 files. This is done with the script `merge-data.py` under `scripts/` folder. Also, there are some data inside a writing that could be a few registers longer, so it is checked the minimum length of the registers, setting it as the new maximum number of registers that will bee kept for each priority. Also, all the data is in $ns$ so it has been transformed into $\mu s$. The data has been tagged if it was retrieved during a execution with stress.
 
 
 ## Data plot
 
+For plotting all the images, use the following command:
 
+```bash
+uv run scripts/plot-data --all
+```
