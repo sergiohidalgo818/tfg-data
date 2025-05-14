@@ -220,7 +220,8 @@ def main():
     elif args.command == "plot-all":
         plot_priorities(df, args.out)
         plot_measures(df, args.out)
-        plot_measure_deviation_number(df, "latency", 100, args.out)
+        maxs = {"duration": 100, "time_step": 100, "latency": 100, "jitter": 2}
+        plot_measures_deviation_number(df, maxs, args.out)
 
 
 if __name__ == "__main__":

@@ -1,14 +1,12 @@
 #!/bin/bash
 
-ITERATIONS=15
+ITERATIONS=10
 DURATION=10
-PRIORITY=90
-SCHED_POLICY=rr
+SCHED_POLICY=fifo
+PRIORITIES=(80 85 90 95 99)
 
 DATADIR=rt_migrate
 GRAPHSDIR=graphs
-CSVFILE=timings.csv
-GRAPHNAME=rt_migrate_plot.png
 
 mkdir -p "$DATADIR" "$GRAPHSDIR"
 rm -rf "$DATADIR"/*
@@ -25,34 +23,39 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-echo "iteration normal_ms rt_ms" >"$DATADIR/$CSVFILE"
+for PRIORITY in "${PRIORITIES[@]}"; do
+  CSVFILE="timings_prio_$PRIORITY.csv"
+  echo "iteration normal_ms rt_ms" >"$DATADIR/$CSVFILE"
 
-for i in $(seq 1 $ITERATIONS); do
-  start=$(date +%s%N)
-  rt-migrate-test -l "$DURATION" >/dev/null
-  end=$(date +%s%N)
-  dur_normal=$(((end - start) / 1000000))
+  echo "Running tests for priority $PRIORITY..."
+  for i in $(seq 1 $ITERATIONS); do
+    start=$(date +%s%N)
+    rt-migrate-test -l "$DURATION" >/dev/null
+    end=$(date +%s%N)
+    dur_normal=$(((end - start) / 1000000))
 
-  start=$(date +%s%N)
-  chrt --$SCHED_POLICY $PRIORITY rt-migrate-test -l "$DURATION" >/dev/null
-  end=$(date +%s%N)
-  dur_rt=$(((end - start) / 1000000))
+    start=$(date +%s%N)
+    chrt --$SCHED_POLICY $PRIORITY rt-migrate-test -l "$DURATION" >/dev/null
+    end=$(date +%s%N)
+    dur_rt=$(((end - start) / 1000000))
 
-  echo "$i $dur_normal $dur_rt" >>"$DATADIR/$CSVFILE"
-done
+    echo "$i $dur_normal $dur_rt" >>"$DATADIR/$CSVFILE"
+  done
 
-cat >"$DATADIR/plot.gnuplot" <<EOF
+  GRAPHNAME="rt_migrate_plot_prio_$PRIORITY.png"
+
+  cat >"$DATADIR/plot_$PRIORITY.gnuplot" <<EOF
 set terminal png size 800,400
 set output "$GRAPHSDIR/$GRAPHNAME"
-set title "rt-migrate-test: RT vs Normal"
+set title "rt-migrate-test: RT vs Normal (Priority $PRIORITY)"
 set xlabel "Iteration"
 set ylabel "Duration (ms)"
 set grid
 set key outside
 plot "$DATADIR/$CSVFILE" using 1:2 with linespoints title "Normal", \
-     "$DATADIR/$CSVFILE" using 1:3 with linespoints title "Real-Time"
+     "$DATADIR/$CSVFILE" using 1:3 with linespoints title "Real-Time (prio $PRIORITY)"
 EOF
 
-gnuplot "$DATADIR/plot.gnuplot"
-
-echo "Graph saved to $GRAPHSDIR/$GRAPHNAME"
+  gnuplot "$DATADIR/plot_$PRIORITY.gnuplot"
+  echo "Graph for priority $PRIORITY saved to $GRAPHSDIR/$GRAPHNAME"
+done
