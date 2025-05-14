@@ -136,6 +136,24 @@ def plot_measure_deviation_number(
     print(f"Data ploted under {output_path}")
 
 
+def plot_measures_deviation_number(
+    df: pd.DataFrame, maximums: dict[str, int], graphs_dir: str
+):
+    """
+    Plot histograms of how many values exceed the given maximum for each measure,
+    grouped by priority and stress.
+    """
+    os.makedirs(graphs_dir, exist_ok=True)
+
+    measures = ["duration", "time_step", "latency", "jitter"]
+
+    for measure in measures:
+        max_value = maximums.get(measure)
+        if max_value is None:
+            max_value = 100
+        plot_measure_deviation_number(df, measure, max_value, graphs_dir)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Plot RT benchmark data")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -147,7 +165,7 @@ def main():
     pp_parser.add_argument("--out", type=str, default="graphs")
 
     pms_parser = subparsers.add_parser(
-        "plot-measures", help="plot each measure across all priorities"
+        "plot-measures", help="Plot each measure across all priorities"
     )
     pms_parser.add_argument("--data", type=str, default="merged-data/data.parquet")
     pms_parser.add_argument("--out", type=str, default="graphs")
@@ -160,6 +178,13 @@ def main():
     )
     pm_parser.add_argument("--data", type=str, default="merged-data/data.parquet")
     pm_parser.add_argument("--out", type=str, default="graphs")
+
+    pmsd_parser = subparsers.add_parser(
+        "plot-measures-deviation",
+        help="Plot each measure deviation across all priorities",
+    )
+    pmsd_parser.add_argument("--data", type=str, default="merged-data/data.parquet")
+    pmsd_parser.add_argument("--out", type=str, default="graphs")
 
     pmd_parser = subparsers.add_parser(
         "plot-measure-deviation",
@@ -186,6 +211,9 @@ def main():
         plot_measures(df, args.out)
     elif args.command == "plot-measure":
         plot_measure(df, args.measure, args.out)
+    elif args.command == "plot-measures-deviation":
+        maxs = {"duration": 100, "time_step": 100, "latency": 100, "jitter": 2}
+        plot_measures_deviation_number(df, maxs, args.out)
     elif args.command == "plot-measure-deviation":
         plot_measure_deviation_number(df, args.measure, args.maximum, args.out)
 
