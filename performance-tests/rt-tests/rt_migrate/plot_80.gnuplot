@@ -1,8 +1,3 @@
-set terminal png size 800,400
-set output "graphs/rt_migrate_plot_prio_80.png"
-set title "rt-migrate-test: RT vs Normal (Priority 80)"
-set xlabel "Iteration"
-set ylabel "Duration (ms)"
-set grid
-set key outside
-plot "rt_migrate/timings_prio_80.csv" using 1:2 with linespoints title "Normal",      "rt_migrate/timings_prio_80.csv" using 1:3 with linespoints title "Real-Time (prio 80)"
+version https://git-lfs.github.com/spec/v1
+oid sha256:4bedb286aebea8d6ee2ec3b735f9e473e3811344b4281eec21a982b9f68aa8d0
+size 383
