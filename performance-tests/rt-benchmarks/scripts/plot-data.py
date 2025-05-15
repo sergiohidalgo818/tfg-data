@@ -148,7 +148,7 @@ def plot_measure_deviation_number(
 
 
 def plot_measures_deviation_number(
-    df: pd.DataFrame, maximums: dict[str, int], graphs_dir: str
+    df: pd.DataFrame, maximums: dict[str, tuple[int]], graphs_dir: str
 ):
     """
     Plot histograms of how many values exceed the given maximum for each measure,
@@ -159,10 +159,13 @@ def plot_measures_deviation_number(
     measures = ["duration", "time_step", "latency", "jitter"]
 
     for measure in measures:
-        max_value = maximums.get(measure)
-        if max_value is None:
-            max_value = 100
-        plot_measure_deviation_number(df, measure, max_value, graphs_dir)
+        max_values = maximums.get(measure)
+
+        if max_values is None:
+            max_values = (100,)
+
+        for max_value in max_values:
+            plot_measure_deviation_number(df, measure, max_value, graphs_dir)
 
 
 def plot_measure_distribution(df: pd.DataFrame, measure: str, graphs_dir: str):
@@ -341,9 +344,17 @@ def main():
     elif args.command == "plot-measure":
         plot_measure(df, args.measure, args.out)
     elif args.command == "plot-measures-deviation":
-        maxs = {"duration": 100, "time_step": 100, "latency": 10, "jitter": 2}
+        maxs = {
+            "duration": (
+                100,
+                120,
+            ),
+            "time_step": (100,),
+            "latency": (10,),
+            "jitter": (2,),
+        }
         plot_measures_deviation_number(df, maxs, args.out)
-    elif args.command == "plot-measure-distribution":
+    elif args.command == "plot-measure-deviation":
         plot_measure_deviation_number(df, args.measure, args.maximum, args.out)
     elif args.command == "plot-measures-distribution":
         plot_measures_distribution(df, args.out)
@@ -352,7 +363,15 @@ def main():
     elif args.command == "plot-all":
         plot_priorities(df, args.out)
         plot_measures(df, args.out)
-        maxs = {"duration": 100, "time_step": 100, "latency": 10, "jitter": 2}
+        maxs = {
+            "duration": (
+                100,
+                120,
+            ),
+            "time_step": (100,),
+            "latency": (10,),
+            "jitter": (2,),
+        }
         plot_measures_deviation_number(df, maxs, args.out)
         plot_measures_distribution(df, args.out)
 
