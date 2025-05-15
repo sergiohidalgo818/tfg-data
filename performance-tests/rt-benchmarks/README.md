@@ -1,4 +1,6 @@
-# RT Benchmarks data
+# RT Benchmarks
+
+RT Benchmarks data, scripts and graphs from different executions on `preempt-rt`. 
 
 ## Prerrequisites
 
