@@ -69,8 +69,8 @@ def plot_measure_distribution(
             edgecolor="white",
         )
 
-    plt.title(f"{measure.capitalize()} Distribution")
-    plt.xlabel(f"{measure.capitalize()} (μs)")
+    plt.title(f"{name.capitalize()} Distribution")
+    plt.xlabel(f"{name.capitalize()} (μs)")
     plt.ylabel("Frequency (log scale)")
     plt.legend()
     plt.grid(False)
