@@ -140,7 +140,7 @@ def plot_measure_deviation_number(
     plt.grid(True, axis="y")
     plt.legend(title="Stress")
 
-    output_path = os.path.join(graphs_dir, f"{measure}_exceeds_{maximum}.png")
+    output_path = os.path.join(graphs_dir, f"{measure}-exceeds-{maximum}.png")
     plt.tight_layout()
     plt.savefig(output_path)
     plt.close()
@@ -185,11 +185,6 @@ def plot_measure_distribution(df: pd.DataFrame, measure: str, graphs_dir: str):
         stress_data = df_priority[df_priority["stress"] == True][measure]
         no_stress_data = df_priority[df_priority["stress"] == False][measure]
 
-        if stress_data.empty and no_stress_data.empty:
-            print(f"⚠️ No data for priority {priority}")
-            continue
-
-        # Define bins based on combined data range
         all_values = pd.concat([stress_data, no_stress_data])
         bins = np.histogram_bin_edges(all_values, bins=40)
 
@@ -234,7 +229,7 @@ def plot_measure_distribution(df: pd.DataFrame, measure: str, graphs_dir: str):
             bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
         )
 
-        filename = f"{measure}_distribution_priority-{priority}.png"
+        filename = f"{measure}-distribution-priority-{priority}.png"
         output_path = os.path.join(graphs_dir, filename)
         plt.tight_layout()
         plt.savefig(output_path)
