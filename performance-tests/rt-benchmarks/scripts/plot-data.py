@@ -10,9 +10,14 @@ def plot_priorities(df: pd.DataFrame, graphs_dir: str):
     """
     Plots all priorities general graphs with stress, without stress and with both
     """
-
+    min_size = min(
+        [
+            len(df[df["priority"] == priority])
+            for priority in sorted(df["priority"].unique())
+        ]
+    )
     for priority in sorted(df["priority"].unique()):
-        df_priority = df[df["priority"] == priority]
+        df_priority = df[df["priority"] == priority][:min_size]
 
         for stress_state, label_suffix in [
             (True, "-stress"),
@@ -37,7 +42,7 @@ def plot_priorities(df: pd.DataFrame, graphs_dir: str):
                 else ""
             )
             plt.title(f"RT Measures for Priority {int(priority)}{title_suffix}")
-            plt.xlabel("Sample Index")
+            plt.xlabel("Time (μs)")
             plt.ylabel("Time (μs)")
             plt.legend()
             plt.grid(True)
@@ -56,17 +61,23 @@ def plot_measure(df: pd.DataFrame, measure: str, graphs_dir: str):
     Plot one measure across all priorities on the same graph.
     Each line represents a different priority.
     """
-
     for stress_state, suffix in [
         (True, "-stress"),
         (False, "-no-stress"),
     ]:
         df_filtered = df if stress_state is None else df[df["stress"] == stress_state]
 
+        min_size = min(
+            [
+                len(df_filtered[df_filtered["priority"] == priority])
+                for priority in sorted(df_filtered["priority"].unique())
+            ]
+        )
+
         plt.figure(figsize=(10, 5))
 
         for priority in sorted(df_filtered["priority"].unique()):
-            df_priority = df_filtered[df_filtered["priority"] == priority]
+            df_priority = df_filtered[df_filtered["priority"] == priority][:min_size]
             plt.plot(
                 df_priority[measure].reset_index(drop=True),
                 label=f"Priority {priority}",
@@ -80,7 +91,7 @@ def plot_measure(df: pd.DataFrame, measure: str, graphs_dir: str):
             else ""
         )
         plt.title(f"{measure.capitalize()} by Priority{title_suffix}")
-        plt.xlabel("Sample Index")
+        plt.xlabel("Time (μs)")
         plt.ylabel(f"{measure.capitalize()} (μs)")
         plt.legend()
         plt.grid(True)
