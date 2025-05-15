@@ -8,5 +8,7 @@ dependencies = [
     "fastparquet>=2024.11.0",
     "h5py>=3.13.0",
     "matplotlib>=3.10.3",
+    "numpy>=2.2.5",
     "pandas>=2.2.3",
+    "seaborn>=0.13.2",
 ]

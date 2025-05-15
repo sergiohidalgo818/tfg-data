@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import argparse
+import seaborn as sns
+import numpy as np
 
 
 def plot_priorities(df: pd.DataFrame, graphs_dir: str):
@@ -13,7 +15,6 @@ def plot_priorities(df: pd.DataFrame, graphs_dir: str):
         df_priority = df[df["priority"] == priority]
 
         for stress_state, label_suffix in [
-            (None, ""),  # Combined
             (True, "-stress"),
             (False, "-no-stress"),
         ]:
@@ -57,7 +58,6 @@ def plot_measure(df: pd.DataFrame, measure: str, graphs_dir: str):
     """
 
     for stress_state, suffix in [
-        (None, ""),
         (True, "-stress"),
         (False, "-no-stress"),
     ]:
@@ -154,6 +154,94 @@ def plot_measures_deviation_number(
         plot_measure_deviation_number(df, measure, max_value, graphs_dir)
 
 
+def plot_measure_distribution(df: pd.DataFrame, measure: str, graphs_dir: str):
+    """
+    For a given measure, plot a combined histogram (bar-style) per priority,
+    showing both stress and no-stress data.
+    """
+    os.makedirs(graphs_dir, exist_ok=True)
+
+    df = df.copy()
+    df[measure] = pd.to_numeric(df[measure], errors="coerce")
+    df = df.dropna(subset=[measure])
+    df = df[df[measure] > 0]
+
+    for priority in sorted(df["priority"].unique()):
+        df_priority = df[df["priority"] == priority]
+        stress_data = df_priority[df_priority["stress"] == True][measure]
+        no_stress_data = df_priority[df_priority["stress"] == False][measure]
+
+        if stress_data.empty and no_stress_data.empty:
+            print(f"⚠️ No data for priority {priority}")
+            continue
+
+        # Define bins based on combined data range
+        all_values = pd.concat([stress_data, no_stress_data])
+        bins = np.histogram_bin_edges(all_values, bins=40)
+
+        plt.figure(figsize=(10, 6))
+
+        if not no_stress_data.empty:
+            plt.hist(
+                no_stress_data,
+                bins=bins,
+                log=True,
+                alpha=0.6,
+                label="No Stress",
+                edgecolor="white",
+            )
+        if not stress_data.empty:
+            plt.hist(
+                stress_data,
+                bins=bins,
+                log=True,
+                alpha=0.6,
+                label="Stress",
+                edgecolor="white",
+            )
+
+        plt.title(f"{measure.capitalize()} Distribution\nPriority {priority}")
+        plt.xlabel(f"{measure.capitalize()} (μs)")
+        plt.ylabel("Frequency (log scale)")
+        plt.legend()
+        plt.grid(False)
+
+        mean_val = all_values.mean()
+        std_val = all_values.std()
+        stats_text = f"Mean: {mean_val:.2f} μs\nStd.Dev: {std_val:.2f} μs"
+        plt.text(
+            0.98,
+            0.95,
+            stats_text,
+            transform=plt.gca().transAxes,
+            fontsize=10,
+            verticalalignment="top",
+            horizontalalignment="right",
+            bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
+        )
+
+        filename = f"{measure}_distribution_priority-{priority}.png"
+        output_path = os.path.join(graphs_dir, filename)
+        plt.tight_layout()
+        plt.savefig(output_path)
+        plt.close()
+
+        print(f"Data ploted under {output_path}")
+
+
+def plot_measures_distribution(df: pd.DataFrame, graphs_dir: str):
+    """
+    Plot histograms (log-scaled y-axis with stats) for all RT measures:
+    duration, time_step, latency, jitter.
+    """
+    os.makedirs(graphs_dir, exist_ok=True)
+
+    measures = ["duration", "time_step", "latency", "jitter"]
+
+    for measure in measures:
+        plot_measure_distribution(df, measure, graphs_dir)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Plot RT benchmark data")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -174,7 +262,11 @@ def main():
         "plot-measure", help="Plot one specific measure across priorities"
     )
     pm_parser.add_argument(
-        "--measure", type=str, required=True, help="Name of the measure to plot"
+        "--measure",
+        type=str,
+        required=True,
+        help="Name of the measure to plot",
+        choices=["latency", "time_step", "duration", "jitter"],
     )
     pm_parser.add_argument("--data", type=str, default="merged-data/data.parquet")
     pm_parser.add_argument("--out", type=str, default="graphs")
@@ -191,18 +283,44 @@ def main():
         help="Plot one specific measure deviation across priorities",
     )
     pmd_parser.add_argument(
-        "--measure", type=str, help="Name of the measure to plot", default="latency"
+        "--measure",
+        type=str,
+        required=True,
+        help="Name of the measure to plot",
+        choices=["latency", "time_step", "duration", "jitter"],
     )
     pmd_parser.add_argument("--maximum", type=int, help="Maximum value")
     pmd_parser.add_argument("--data", type=str, default="merged-data/data.parquet")
     pmd_parser.add_argument("--out", type=str, default="graphs")
+
+    pmsdis_parser = subparsers.add_parser(
+        "plot-measures-distribution",
+        help="Plot each measure deviation across all priorities",
+    )
+    pmsdis_parser.add_argument("--data", type=str, default="merged-data/data.parquet")
+    pmsdis_parser.add_argument("--out", type=str, default="graphs")
+
+    pmdis_parser = subparsers.add_parser(
+        "plot-measure-distribution",
+        help="Plot one specific measure distribution across priorities",
+    )
+    pmdis_parser.add_argument(
+        "--measure",
+        type=str,
+        required=True,
+        help="Name of the measure to plot",
+        choices=["latency", "time_step", "duration", "jitter"],
+    )
+    pmdis_parser.add_argument("--maximum", type=int, help="Maximum value")
+    pmdis_parser.add_argument("--data", type=str, default="merged-data/data.parquet")
+    pmdis_parser.add_argument("--out", type=str, default="graphs")
 
     a_parser = subparsers.add_parser("plot-all", help="Plot all")
     a_parser.add_argument("--data", type=str, default="merged-data/data.parquet")
     a_parser.add_argument("--out", type=str, default="graphs")
 
     args = parser.parse_args()
-    df = pd.read_parquet(args.data)
+    df: pd.DataFrame = pd.read_parquet(args.data)
     os.makedirs(args.out, exist_ok=True)
 
     if args.command == "plot-priorities":
@@ -212,16 +330,20 @@ def main():
     elif args.command == "plot-measure":
         plot_measure(df, args.measure, args.out)
     elif args.command == "plot-measures-deviation":
-        maxs = {"duration": 100, "time_step": 100, "latency": 100, "jitter": 2}
+        maxs = {"duration": 100, "time_step": 100, "latency": 10, "jitter": 2}
         plot_measures_deviation_number(df, maxs, args.out)
-    elif args.command == "plot-measure-deviation":
+    elif args.command == "plot-measure-distribution":
         plot_measure_deviation_number(df, args.measure, args.maximum, args.out)
-
+    elif args.command == "plot-measures-distribution":
+        plot_measures_distribution(df, args.out)
+    elif args.command == "plot-measure-distribution":
+        plot_measure_distribution(df, args.measure, args.out)
     elif args.command == "plot-all":
         plot_priorities(df, args.out)
         plot_measures(df, args.out)
-        maxs = {"duration": 100, "time_step": 100, "latency": 100, "jitter": 2}
+        maxs = {"duration": 100, "time_step": 100, "latency": 10, "jitter": 2}
         plot_measures_deviation_number(df, maxs, args.out)
+        plot_measures_distribution(df, args.out)
 
 
 if __name__ == "__main__":
