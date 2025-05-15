@@ -77,6 +77,7 @@ def main():
                 df_aux: pd.DataFrame = pd.DataFrame(
                     {
                         "priority": [priority_num] * min_len,
+                        "time": hdf_file_dict["duration"]["time"][:min_len],
                         "duration": hdf_file_dict["duration"]["value"][:min_len].apply(
                             lambda x: x / nano_to_micro
                         ),
@@ -93,6 +94,11 @@ def main():
                     }
                 )
                 df = pd.concat([df, df_aux], ignore_index=True)
+
+    df["priority"] = df["priority"].astype("int32")
+    df["time"] = df["time"].astype("int64")
+
+    df.sort_values(by=["priority", "time"], inplace=True)
 
     data_dir = "merged-data"
     if not os.path.exists(data_dir):
