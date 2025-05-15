@@ -5,7 +5,6 @@ Script to merge the data from the h5 files
 import pandas as pd
 import os
 import h5py
-from pandas.core.base import nanops
 
 
 def read_field_as_df(group: h5py.File, name: str) -> pd.DataFrame:
