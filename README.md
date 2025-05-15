@@ -2,6 +2,9 @@
 
 This repository contains all the data and scripts to plot it used in my *TFG*.
 
+>[!WARNING]
+>This repository uses `git-lfs`, please install it before cloning it.
+
 ## Hierarchy 
 
 ### Neuron circuits
