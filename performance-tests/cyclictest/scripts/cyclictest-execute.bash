@@ -85,15 +85,17 @@ segregate_output_singlecore() {
 }
 
 # Run with all CPUs
-all_cores=$(($(grep 'cpu cores' /proc/cpuinfo | uniq | awk '{print $4}') - 1))
+all_cores=$(grep 'cpu cores' /proc/cpuinfo | uniq | awk '{print $4}')
 run_test "all CPUs" "$DATADIRMAX" "--duration=10m --mlockall --smp --priority=90 -i100 -h100 -q"
-# Run with one CPU
-run_test "one CPU" "$DATADIRONE" "--duration=10m --mlockall --priority=90 -i100 -h100 -q -a 1"
 
-# # Run with one isolated CPU
+# Run with one CPU
+one_cpu=2
+run_test "one CPU" "$DATADIRONE" "--duration=10m --mlockall --priority=90 -i100 -h100 -q -a $one_cpu"
+
+# Run with one isolated CPU
 isolated_cpu=5
-run_test_isolated "isolated CPU" "$DATADIRISOCORE" "--duration=10m --mlockall --priority=90 -i100 -h100 -q -a 5" $isolated_cpu
+run_test_isolated "isolated CPU" "$DATADIRISOCORE" "--duration=10m --mlockall --priority=90 -i100 -h100 -q -a $isolated_cpu" $isolated_cpu
 
 segregate_output "$DATADIRMAX" "$all_cores"
-segregate_output_singlecore "$DATADIRONE" 1
+segregate_output_singlecore "$DATADIRONE" $one_cpu
 segregate_output_singlecore "$DATADIRISOCORE" $isolated_cpu
