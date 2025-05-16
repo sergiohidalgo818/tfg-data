@@ -88,7 +88,7 @@ segregate_output_singlecore() {
 all_cores=$(($(grep 'cpu cores' /proc/cpuinfo | uniq | awk '{print $4}') - 1))
 run_test "all CPUs" "$DATADIRMAX" "--duration=10m --mlockall --smp --priority=90 -i100 -h100 -q"
 # Run with one CPU
-run_test "one CPU" "$DATADIRONE" "--duration=10m --mlockall --priority=90 -i100 -h100 -q -a 2"
+run_test "one CPU" "$DATADIRONE" "--duration=10m --mlockall --priority=90 -i100 -h100 -q -a 1"
 
 # # Run with one isolated CPU
 isolated_cpu=5
