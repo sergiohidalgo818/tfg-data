@@ -80,5 +80,5 @@ def plot_histogram(histogram_dir: str, output_file: str):
 
 
 if __name__ == "__main__":
-    plot_histogram("cyclictest-data/maxcores/", "graphs/cyclictest_max_cores.png")
-    plot_histogram("cyclictest-data/onecore/", "graphs/cyclictest_one_core.png")
+    plot_histogram("cyclictest-data/maxcores/", "graphs/cyclictest-max-cores.png")
+    plot_histogram("cyclictest-data/onecore/", "graphs/cyclictest-one-core.png")
