@@ -1,7 +1,7 @@
 [project]
 name = "rt-benchmarks"
 version = "0.1.0"
-description = "Add your description here"
+description = "This project contains all the required python modules to ploot the data"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

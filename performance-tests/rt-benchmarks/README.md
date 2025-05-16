@@ -4,7 +4,7 @@ RT Benchmarks data, scripts and graphs from different executions on `preempt-rt`
 
 ## Prerrequisites
 
-For executing any of the scripts, you will need to use `uv run scripts/<script>`. For installing `uv`, please go to [the official uv page](https://docs.astral.sh/uv/getting-started/installation/).
+For installing `uv`, please go to [the official uv page](https://docs.astral.sh/uv/getting-started/installation/).
 
 ## Execution
 
@@ -22,8 +22,10 @@ In order to simplifying the analysis of this data, it has been merged into a sin
 
 ## Data plot
 
-For plotting all the images, use the following command:
+For plotting all the images, use the following commands:
 
 ```bash
-uv run scripts/plot-data --all
+uv run scripts/plot-data.py --plot-all
+uv run scripts/read-and-plot-rtxi-stress.py
 ```
+
