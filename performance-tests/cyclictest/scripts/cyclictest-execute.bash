@@ -16,11 +16,11 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-# mkdir -p $DATADIR
-# rm -rf $DATADIR/*
-# mkdir -p $DATADIRMAX
-# mkdir -p $DATADIRONE
-# mkdir -p $DATADIRISOCORE
+mkdir -p $DATADIR
+rm -rf $DATADIR/*
+mkdir -p $DATADIRMAX
+mkdir -p $DATADIRONE
+mkdir -p $DATADIRISOCORE
 
 run_test() {
   local label=$1
@@ -30,7 +30,7 @@ run_test() {
   echo "Running for $label"
 
   (cyclictest $cyclictest_args >"$output_dir/output") &
-  stress --cpu 2 --vm 1 --hdd 1 --timeout 60
+  stress --cpu 2 --vm 1 --hdd 1 --timeout 600
 
 }
 
@@ -56,7 +56,7 @@ run_test_isolated() {
   echo "Running for $label"
 
   (taskset -c $isolated_cpu cyclictest $cyclictest_args >"$output_dir/output") &
-  stress --cpu 2 --vm 1 --hdd 1 --timeout 60
+  stress --cpu 2 --vm 1 --hdd 1 --timeout 600
 
 }
 
@@ -86,11 +86,14 @@ segregate_output_singlecore() {
 
 # Run with all CPUs
 all_cores=$(($(grep 'cpu cores' /proc/cpuinfo | uniq | awk '{print $4}') - 1))
-run_test "all CPUs" "$DATADIRMAX" "--duration=1m --mlockall --smp --priority=90 -i100 -h100 -q" && segregate_output "$DATADIRMAX" "$all_cores"
-
+run_test "all CPUs" "$DATADIRMAX" "--duration=10m --mlockall --smp --priority=90 -i100 -h100 -q"
 # Run with one CPU
-run_test "one CPU" "$DATADIRONE" "--duration=1m --mlockall --priority=90 -i100 -h100 -q -a 2" && segregate_output_singlecore "$DATADIRONE" 1
+run_test "one CPU" "$DATADIRONE" "--duration=10m --mlockall --priority=90 -i100 -h100 -q -a 2"
 
 # # Run with one isolated CPU
 isolated_cpu=5
-run_test_isolated "isolated CPU" "$DATADIRISOCORE" "--duration=1m --mlockall --priority=90 -i100 -h100 -q -a 5" $isolated_cpu && segregate_output_singlecore "$DATADIRISOCORE" $isolated_cpu
+run_test_isolated "isolated CPU" "$DATADIRISOCORE" "--duration=10m --mlockall --priority=90 -i100 -h100 -q -a 5" $isolated_cpu
+
+segregate_output "$DATADIRMAX" "$all_cores"
+segregate_output_singlecore "$DATADIRONE" 1
+segregate_output_singlecore "$DATADIRISOCORE" $isolated_cpu
