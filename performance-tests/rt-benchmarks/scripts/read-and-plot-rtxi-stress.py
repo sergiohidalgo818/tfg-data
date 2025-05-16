@@ -39,7 +39,7 @@ def read_hdf_as_dict(filename: str) -> dict:
 
 
 def plot_measure_distribution(
-    df: pd.DataFrame, measure: str, name: str, graphs_dir: str
+    df: pd.DataFrame, measure: str, name: str, graphs_dir: str, extra_tag: str = ""
 ):
     """
     For a given measure, plot a combined histogram (bar-style) per priority,
@@ -89,7 +89,7 @@ def plot_measure_distribution(
         bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
     )
 
-    filename = f"{name}-distribution-rtxi-test.png"
+    filename = f"{name}-distribution-rtxi-test{extra_tag}.png"
     output_path = os.path.join(graphs_dir, filename)
     plt.tight_layout()
     plt.savefig(output_path)
@@ -101,11 +101,14 @@ def plot_measure_distribution(
 if __name__ == "__main__":
     graphs_dir = "graphs"
     directory = "rtxi-stress"
+    directory_isolated = "rtxi-stress-isolated"
     hdf5_filename = "workload.h5"
 
     os.makedirs(graphs_dir, exist_ok=True)
 
     dfs = read_hdf_as_dict(os.path.join(directory, hdf5_filename))
+    dfs2 = read_hdf_as_dict(os.path.join(directory, hdf5_filename))
 
     for key in dfs:
         plot_measure_distribution(dfs[key], "value", key, graphs_dir)
+        plot_measure_distribution(dfs2[key], "value", key, graphs_dir, "-isolated")

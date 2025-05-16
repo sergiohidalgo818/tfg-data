@@ -26,7 +26,7 @@ def plot_histogram(histogram_dir: str, output_file: str):
     for i, path in enumerate(hist_files):
         df = pd.read_csv(path, sep="\t", header=None, names=["latency_us", "count"])
         samples = np.repeat(df["latency_us"].values, df["count"].astype(int).values)
-        core_samples[f"CPU{i}"] = samples
+        core_samples[f"CPU{path.split('histogram')[1]}"] = samples
 
     all_samples = np.concatenate(list(core_samples.values()))
     bins = np.histogram_bin_edges(all_samples, bins=BIN_COUNT)
@@ -82,3 +82,4 @@ def plot_histogram(histogram_dir: str, output_file: str):
 if __name__ == "__main__":
     plot_histogram("cyclictest-data/maxcores/", "graphs/cyclictest-max-cores.png")
     plot_histogram("cyclictest-data/onecore/", "graphs/cyclictest-one-core.png")
+    plot_histogram("cyclictest-data/isocore/", "graphs/cyclictest-isolated-core.png")
