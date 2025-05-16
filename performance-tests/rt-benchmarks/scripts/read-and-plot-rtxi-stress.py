@@ -107,7 +107,7 @@ if __name__ == "__main__":
     os.makedirs(graphs_dir, exist_ok=True)
 
     dfs = read_hdf_as_dict(os.path.join(directory, hdf5_filename))
-    dfs2 = read_hdf_as_dict(os.path.join(directory, hdf5_filename))
+    dfs2 = read_hdf_as_dict(os.path.join(directory_isolated, hdf5_filename))
 
     for key in dfs:
         plot_measure_distribution(dfs[key], "value", key, graphs_dir)
