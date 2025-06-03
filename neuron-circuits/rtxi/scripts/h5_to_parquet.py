@@ -1,5 +1,5 @@
 """
-Script to generate a parquet from a h5 file
+Script to generate a parquet from a h5 file for a synaptic iteration recorded on rtxi
 """
 
 import pandas as pd
@@ -66,7 +66,6 @@ def main(directory: str, separator: str):
     for file in hdf_files:
         hdf_file_dict: dict = read_hdf_as_dict(os.path.join(directory, file))
 
-        print(hdf_file_dict)
         min_len: int = min([len(hdf_file_dict[key]) for key in hdf_file_dict.keys()])
 
         df: pd.DataFrame = pd.DataFrame(
@@ -82,8 +81,13 @@ def main(directory: str, separator: str):
         if not os.path.exists(data_dir):
             os.mkdir(data_dir)
 
-        df.to_parquet(data_dir + "/" + file.split(".")[0] + ".parquet", index=False)
-        print("Data merged on " + data_dir + "/data.parquet")
+        full_data_dir = os.path.join(data_dir, directory)
+        if not os.path.exists(full_data_dir):
+            os.mkdir(full_data_dir)
+
+        full_data_path = os.path.join(full_data_dir, file.replace(".h5", ".parquet"))
+        df.to_parquet(full_data_path, index=False)
+        print("Data merged on " + full_data_path)
 
 
 if __name__ == "__main__":
