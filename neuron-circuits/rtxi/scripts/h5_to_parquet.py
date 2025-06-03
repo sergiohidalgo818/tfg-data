@@ -30,7 +30,7 @@ def name_traduction(name: str, last_name: Union[str, None]) -> str:
         if last_name is None:
             return "model_neuron"
         elif last_name == "model_neuron":
-            return "live_neuron"
+            return "model_neuron_2"
 
     return "model_neuron"
 
@@ -54,8 +54,6 @@ def main(directory: str, separator: str):
     files = os.listdir(directory)
 
     hdf_files = [f for f in files if f.endswith(".h5")]
-
-    nano_to_micro = 1000
 
     df: pd.DataFrame = pd.DataFrame(
         {
