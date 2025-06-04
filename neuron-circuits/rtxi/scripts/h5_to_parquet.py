@@ -50,7 +50,7 @@ def read_hdf_as_dict(filename: str) -> dict:
     return dfs
 
 
-def main(directory: str, separator: str):
+def main(directory: str):
     files = os.listdir(directory)
 
     hdf_files = [f for f in files if f.endswith(".h5")]
@@ -61,6 +61,11 @@ def main(directory: str, separator: str):
             "time": [],
         }
     )
+    data_dir = "processed-data"
+
+    if not os.path.exists(data_dir):
+        os.mkdir(data_dir)
+
     for file in hdf_files:
         hdf_file_dict: dict = read_hdf_as_dict(os.path.join(directory, file))
 
@@ -74,11 +79,6 @@ def main(directory: str, separator: str):
             }
         )
 
-        data_dir = "raw-data"
-
-        if not os.path.exists(data_dir):
-            os.mkdir(data_dir)
-
         full_data_dir = os.path.join(data_dir, directory)
         if not os.path.exists(full_data_dir):
             os.mkdir(full_data_dir)
@@ -91,7 +91,6 @@ def main(directory: str, separator: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--directory", type=str, required=True)
-    parser.add_argument("-s", "--separator", type=str, default=" ")
     args = parser.parse_args()
 
-    main(args.directory, args.separator)
+    main(args.directory)

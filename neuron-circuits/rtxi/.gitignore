@@ -10,5 +10,5 @@ wheels/
 .venv
 
 
-# Raw parquet data
-raw-data/
+# Processed parquet data
+processed-data/
