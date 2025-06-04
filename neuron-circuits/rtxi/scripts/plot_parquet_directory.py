@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def process_and_plot_parquets(directory: str):
+def process_and_plot_parquets(directory: str, start: bool = False):
     name_dir = directory.split("/")[1]
     graph_dir = os.path.join("graphs", os.path.basename(os.path.normpath(name_dir)))
     os.makedirs(graph_dir, exist_ok=True)
@@ -27,7 +27,10 @@ def process_and_plot_parquets(directory: str):
                     print(f"Skipping {file_name}: missing required columns")
                     continue
 
-                df = df.iloc[len(df) - max_len : len(df)]
+                if not start:
+                    df = df.iloc[len(df) - max_len : len(df)]
+                else:
+                    df = df.iloc[:max_len]
 
                 plt.figure(figsize=(14, 6))
                 plt.plot(df["time"], df["live_neuron"], label="Live Neuron")
@@ -39,9 +42,16 @@ def process_and_plot_parquets(directory: str):
                 plt.margins(0)
                 plt.tight_layout()
 
-                output_file = os.path.join(
-                    graph_dir, f"{name_dir}-{os.path.splitext(file_name)[0]}.png"
-                )
+                if not start:
+                    output_file = os.path.join(
+                        graph_dir, f"{name_dir}-{os.path.splitext(file_name)[0]}.png"
+                    )
+                else:
+                    output_file = os.path.join(
+                        graph_dir,
+                        f"{name_dir}-{os.path.splitext(file_name)[0]}-initial.png",
+                    )
+
                 plt.savefig(output_file)
                 plt.close()
                 print(f"Saved plot for {file_name} to {output_file}")
@@ -49,13 +59,17 @@ def process_and_plot_parquets(directory: str):
                 print(f"Error processing {file_name}: {e}")
 
 
-def main(directory: str):
+def main(directory: str, start: bool):
     process_and_plot_parquets(directory)
+    if start:
+        process_and_plot_parquets(directory, start)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--directory", type=str, required=True)
+    parser.add_argument("-s", "--start", action="store_true")
+
     args = parser.parse_args()
 
-    main(args.directory)
+    main(args.directory, args.start)
