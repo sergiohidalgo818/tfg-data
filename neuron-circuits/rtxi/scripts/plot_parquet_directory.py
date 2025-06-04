@@ -40,7 +40,7 @@ def process_and_plot_parquets(directory: str):
                 plt.tight_layout()
 
                 output_file = os.path.join(
-                    graph_dir, f"{os.path.splitext(file_name)[0]}.png"
+                    graph_dir, f"{name_dir}-{os.path.splitext(file_name)[0]}.png"
                 )
                 plt.savefig(output_file)
                 plt.close()
