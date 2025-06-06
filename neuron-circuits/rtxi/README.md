@@ -154,7 +154,7 @@ Virtual is the RTHybrid model plugin and electrical is the physical electrical m
 config:
   theme: mc
   look: classic
-  layout: elk
+  layout: dagre
 ---
 flowchart TD
     n1(["RTHybrid Hindmarsh-Rose model V2"]) -- "Post-Synaptic Voltage" --> A(["Electrical Synapse Recorded-Virtual"])
