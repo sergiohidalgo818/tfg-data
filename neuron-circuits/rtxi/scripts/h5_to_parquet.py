@@ -24,7 +24,7 @@ def read_field_as_df(group: h5py.File, name: str) -> pd.DataFrame:
 
 
 def name_traduction(name: str, last_name: Union[str, None]) -> str:
-    if "PCI" in name:
+    if "PCI" in name or "wave" in name:
         return "live_neuron"
     else:
         if last_name is None:
@@ -50,7 +50,13 @@ def read_hdf_as_dict(filename: str) -> dict:
     return dfs
 
 
-def main(directory: str):
+def main(
+    directory: str,
+    neuron_1_offset: float,
+    neuron_2_offset: float,
+    neuron_1_scale: float,
+    neuron_2_scale: float,
+):
     files = os.listdir(directory)
 
     hdf_files = [f for f in files if f.endswith(".h5")]
@@ -74,8 +80,12 @@ def main(directory: str):
         df: pd.DataFrame = pd.DataFrame(
             {
                 "time": hdf_file_dict["live_neuron"]["time"][:min_len],
-                "live_neuron": hdf_file_dict["live_neuron"]["value"][:min_len],
-                "model_neuron": hdf_file_dict["model_neuron"]["value"][:min_len],
+                "live_neuron": hdf_file_dict["live_neuron"]["value"][:min_len].apply(
+                    lambda x: x * neuron_1_scale + neuron_1_offset
+                ),
+                "model_neuron": hdf_file_dict["model_neuron"]["value"][:min_len].apply(
+                    lambda x: x * neuron_2_scale + neuron_2_offset
+                ),
             }
         )
 
@@ -91,6 +101,17 @@ def main(directory: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--directory", type=str, required=True)
+    parser.add_argument("-n1o", "--neuron-1-offset", type=float, default=0.0)
+    parser.add_argument("-n2o", "--neuron-2-offset", type=float, default=0.0)
+    parser.add_argument("-n1s", "--neuron-1-scale", type=float, default=1.0)
+    parser.add_argument("-n2s", "--neuron-2-scale", type=float, default=1.0)
+
     args = parser.parse_args()
 
-    main(args.directory)
+    main(
+        args.directory,
+        args.neuron_1_offset,
+        args.neuron_2_offset,
+        args.neuron_1_scale,
+        args.neuron_2_scale,
+    )
