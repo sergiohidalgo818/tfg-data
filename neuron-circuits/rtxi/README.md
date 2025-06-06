@@ -147,7 +147,7 @@ flowchart TD
 
 ### Plugin Connection
 
-Virtual is the RTHybrid model plugin and electrical is the physical electrical model.
+Virtual is the RTHybrid model plugin and electrical is the physical electrical model. Because of the nature of the recording, it cannot be upscaled as the previous circuits.
 
 ```mermaid
 ---
