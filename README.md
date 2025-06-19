@@ -13,6 +13,7 @@ Under `neuron-circuits/` directory, different neuron circuits can be found.
 
 Inside of it:
 - `rtxi/` contains circuits done using *RTXI*.
+- `pico-neuron/` contains models done using *pico-neuron*.
 
 
 ### Performance tests
